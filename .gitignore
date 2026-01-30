@@ -167,3 +167,5 @@ cython_debug/
 
  
 *.gz
+*.tar
+/total
