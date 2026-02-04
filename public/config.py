@@ -2,7 +2,7 @@
 k_folds = 5 # number of folds for cross-validation, if 1, no cross-validation
 strategy = 'flux' # ['fedavg', 'flux', 'flux_dynamic', 'optimal_FL']
 random_seed = 42
-gpu = 3 # set the GPU to use, if -1 use CPU, -2 for multigpus
+gpu = 0 # set the GPU to use, if -1 use CPU, -2 for multigpus
 n_clients = 10
 n_samples_clients = -1 # if -1, use all samples
 
@@ -23,7 +23,7 @@ eps_scaling = 1.0 # for clustering method 4
 th_round = 0.06 # derivative threshold on accuracy trend for starting clustering (good enough evaluation model)
 
 # Dataset settings
-dataset_name = "MNIST" # ["CIFAR10", "CIFAR100", "MNIST", "FMNIST", "EMNIST", "CheXpert", "Office-Home"]
+dataset_name = "CUSTOM_IMAGEFOLDER" # ["CIFAR10", "CIFAR100", "MNIST", "FMNIST", "EMNIST", "CheXpert", "Office-Home", "CUSTOM_IMAGEFOLDER"]
 drifting_type = 'static' # ['static', 'trND_teDR', 'trDA_teDR', 'trDA_teND', 'trDR_teDR', 'trDR_teND'] refer to ANDA page for more details
 drifting_round = 8 # to be used with trDR_teND
 max_labels = 20 # limit the number of labels for Office-Home
@@ -31,6 +31,12 @@ non_iid_type = 'label_condition_skew' # refer to ANDA page for more details (use
 verbose = True
 count_labels = True
 plot_clients = False
+
+# Custom ImageFolder dataset settings (only used when dataset_name="CUSTOM_IMAGEFOLDER")
+custom_data_path = "./total/001"  # Path to your ImageFolder dataset
+train_test_split_ratio = 0.8  # 80% train, 20% test
+custom_n_classes = 600  # Number of classes in your custom dataset
+custom_input_size = (90, 90)  # Image size for your custom dataset (will be resized to this)
 
 # Training model settings
 model_name = "LeNet5"   # ["LeNet5", "ResNet9"] - LeNet5 for MNIST, FMNIST, CIFAR10; ResNet9 for CIFAR100, CheXpert, Office-Home
@@ -83,7 +89,8 @@ n_classes_dict = {
     "MNIST": 10,
     "FMNIST": 10,
     "CheXpert": 14,
-    "Office-Home": max_labels
+    "Office-Home": max_labels,
+    "CUSTOM_IMAGEFOLDER": custom_n_classes
 }
 n_classes = n_classes_dict[dataset_name]
 
@@ -93,7 +100,8 @@ input_size_dict = {
     "MNIST": (28, 28),
     "FMNIST": (28, 28),
     "CheXpert": (64, 64),
-    "Office-Home": (64, 64) 
+    "Office-Home": (64, 64),
+    "CUSTOM_IMAGEFOLDER": custom_input_size
 }
 input_size = input_size_dict[dataset_name]
 
@@ -108,5 +116,6 @@ ip = '0.0.0.0' # Local Host=0.0.0.0, or IP address of the server
 # Advance One-shot settings
 len_metric_descriptor =  n_classes
 n_metrics_descriptors = 2 if extended_descriptors else 1
-len_latent_space_descriptor = 1 * len_metric_descriptor   # modify this to change the latent space size
+# For datasets with many classes, limit PCA components to avoid exceeding sample size
+len_latent_space_descriptor = min(100, 1 * len_metric_descriptor)   # limit to max 100 components for PCA
 n_latent_space_descriptors = 2 if extended_descriptors else 1

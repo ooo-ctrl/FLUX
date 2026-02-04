@@ -37,7 +37,7 @@ parser.add_argument('--non_iid_type', type=str, default=cfg.drifting_type, help=
 args = parser.parse_args()
 
 # valid dataset names
-assert cfg.dataset_name in ['CIFAR10', 'CIFAR100', 'MNIST', 'FMNIST', 'EMNIST'], \
+assert cfg.dataset_name in ['CIFAR10', 'CIFAR100', 'MNIST', 'FMNIST', 'EMNIST', 'CUSTOM_IMAGEFOLDER'], \
         "Dataset not found! Please check the ANDA page for more details."
 
 # Create folder if not exist
@@ -149,6 +149,9 @@ if cfg.drifting_type == 'static':
         count_labels=cfg.count_labels,
         plot_clients=cfg.plot_clients,
         random_seed = cfg.random_seed + args.fold,
+        custom_data_path = cfg.custom_data_path if cfg.dataset_name == 'CUSTOM_IMAGEFOLDER' else None,
+        train_test_split_ratio = cfg.train_test_split_ratio if cfg.dataset_name == 'CUSTOM_IMAGEFOLDER' else 0.8,
+        custom_image_size = cfg.custom_input_size if cfg.dataset_name == 'CUSTOM_IMAGEFOLDER' else (90, 90),
         # **cfg.args
         **cur_args
     )
